@@ -20,8 +20,11 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module converter();
-    reg mode; // 绑定到开关12
-    decoder dec(.turn_on (~mode));
-    encode enc(.turn_on (mode));
-endmodule
+// module converter(
+//     input mode,
+//     input clk
+// );
+//     // reg mode; // 绑定到开关12
+//     decoder dec(.turn_on (~mode));
+//     encoder enc(.turn_on (mode));
+// endmodule
