@@ -22,23 +22,33 @@
 
 module buzzer(input [139:0] code,     // 14 * 8 + 7 * 4
               input clk,
+              input rst_n,
               output reg clk_buzzer);
-// initial begin
-//     clk2 = 1'b0;
-// end
-wire clk_out;
 reg [7:0] switches;
-clk_div_even #(50000000, 26) clk_divider(.clk(clk), .clk_out(clk_2hz));
-// 5 * 10^7 in binary:10111110101111000010000000 (26bits)
 reg [7:0] bit_counter = 0;
-always @(clk_2hz) begin
-    if (bit_counter%14 == 0) begin
-        if (switches[bit_counter/14] == 0) begin
-            bit_counter <= bit_counter + 14;
-        end
+
+reg [24:0] cnt;
+wire clk_0.6s;
+
+always @ (posedge clk or rst_n)
+    if (rst_n)
+        cnt <= 0;
+    else
+        cnt <= cnt + 1'b1;
+
+assign clk_0.6s = cnt[24];
+
+always @(clk_0.6s or rst_n) begin
+    if (rst_n) begin
+        bit_counter <= 0;
     end
-    clk_buzzer  <= code[bit_counter] & clk_2hz;
-    bit_counter <= bit_counter + 1;
-    // $display("clk2hz: %d, bit_counter: %d, code: %d, clk2: %d",clk_2hz, bit_counter, code[bit_counter], clk2);
+    else
+        if (bit_counter == 0 or bit_counter == 18 or bit_counter == 36 || bit_counter == 54 || bit_counter == 72 || bit_counter == 90 || bit_counter == 108 || bit_counter == 126) begin
+            if (switches[bit_counter/14] == 0) begin
+                bit_counter <= bit_counter + 14;
+            end
+        end
+        clk_buzzer  <= code[bit_counter] & clk_0.6s;
+        bit_counter <= bit_counter + 1;
 end
 endmodule
